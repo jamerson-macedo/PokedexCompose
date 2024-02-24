@@ -32,13 +32,13 @@ class MainActivity : ComponentActivity() {
                             type = NavType.StringType
                         })
                     ) {
-                        val dominantColor = remember {
-                            val color = it.arguments?.getInt("dominantColor")
+                        val dominantColor= remember {
+                            val color=it.arguments?.getInt("dominantColor")
                             color?.let {
                                 Color(it)
-                            } ?: Color.White
+                            }?:Color.White
                         }
-                        val pokemonName = remember {
+                        val pokemonName= remember {
                             it.arguments?.getString("pokemonName")
                         }
                     }

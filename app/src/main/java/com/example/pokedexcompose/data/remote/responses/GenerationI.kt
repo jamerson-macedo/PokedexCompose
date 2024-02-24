@@ -1,6 +1,10 @@
-package com.example.pokedexcompose.data.remote.responses
+package com.plcoding.jetpackcomposepokedex.data.remote.responses
+
+
+import com.google.gson.annotations.SerializedName
 
 data class GenerationI(
-    val red-blue: RedBlue,
+    @SerializedName("red-blue")
+    val redBlue: RedBlue,
     val yellow: Yellow
 )
