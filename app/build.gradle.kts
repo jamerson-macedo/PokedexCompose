@@ -86,6 +86,10 @@ dependencies {
     implementation ("com.jakewharton.timber:timber:5.0.1")
 
     implementation ("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.palette:palette-ktx:1.0.0")
+    // coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
 
 }
 kapt {
