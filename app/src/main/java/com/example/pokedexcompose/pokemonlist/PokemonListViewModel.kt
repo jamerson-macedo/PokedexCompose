@@ -13,6 +13,7 @@ import com.example.pokedexcompose.repository.PokemonRepository
 import com.example.pokedexcompose.util.Constants.PAGE_SIZE
 import com.example.pokedexcompose.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -34,6 +35,39 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
 
     // chegou no final
     var endReached = mutableStateOf(false)
+
+    private var cachedPokemonList = listOf<PokedexListEntry>()
+    private var isSearchingStarting = true
+    var isSearching = mutableStateOf(false)
+    fun searchPokemonList(query: String) {
+        val listSearch = if (isSearchingStarting) {
+            pokemonList.value
+        } else {
+            cachedPokemonList
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            if (query.isEmpty()) {
+                pokemonList.value = cachedPokemonList
+                isSearching.value = false
+                isSearchingStarting = true
+                return@launch
+            }
+            val result = listSearch.filter { pokemon ->
+                pokemon.pokemonName.contains(
+                    query.trim(),
+                    ignoreCase = true
+                ) || pokemon.number.toString() == query.trim()
+
+            }
+            if(isSearchingStarting){
+                cachedPokemonList=pokemonList.value
+                isSearchingStarting=false
+            }
+            pokemonList.value=result
+            isSearching.value=true
+        }
+    }
+
     init {
         loadPokemonPaginated()
     }
@@ -66,17 +100,17 @@ class PokemonListViewModel @Inject constructor(private val repository: PokemonRe
                     }
                     // apos carregar ja atualiza a pagina
                     curPage++
-                    loadError.value=""
-                    isLoading.value=false
+                    loadError.value = ""
+                    isLoading.value = false
                     // por final passa os valores para a lista de pokemon
                     // testar dps sem o +
-                    pokemonList.value+=pokedexEntry
+                    pokemonList.value += pokedexEntry
 
                 }
 
                 is Resource.Error -> {
-                    loadError.value=result.message!!
-                    isLoading.value=false
+                    loadError.value = result.message!!
+                    isLoading.value = false
 
                 }
 

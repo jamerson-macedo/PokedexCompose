@@ -21,8 +21,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -54,7 +57,7 @@ import com.example.pokedexcompose.data.models.PokedexListEntry
 import com.example.pokedexcompose.ui.theme.RobotoCondensed
 
 @Composable
-fun PokemonListScreen(navController: NavController) {
+fun PokemonListScreen(navController: NavController,viewModel: PokemonListViewModel = hiltViewModel()) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()) {
         Column {
             Spacer(modifier = Modifier.height(20.dp))
@@ -65,7 +68,8 @@ fun PokemonListScreen(navController: NavController) {
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             )
-            SearchBar() {
+            SearchBar {
+                viewModel.searchPokemonList(it)
 
             }
             Spacer(
@@ -92,6 +96,10 @@ fun SearchBar(
         OutlinedTextField(
             singleLine = true,
             value = text,
+            colors = TextFieldDefaults.colors(
+
+                cursorColor = MaterialTheme.colorScheme.secondary,
+            ),
             onValueChange = {
                 text = it
                 onSearch(it)
@@ -183,6 +191,9 @@ fun PokemonList(navController: NavController, viewModel: PokemonListViewModel = 
     val loadError by remember {
         viewModel.loadError
     }
+    val isSearching by remember {
+        viewModel.isSearching
+    }
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
         val itemCount = if (pokemonlist.size % 2 == 0) {
             pokemonlist.size / 2
@@ -191,7 +202,7 @@ fun PokemonList(navController: NavController, viewModel: PokemonListViewModel = 
         }
         items(itemCount) {
             // verificando paginação
-            if (it >= itemCount - 1 && !endReached) {
+            if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
                 viewModel.loadPokemonPaginated()
             }
             PokedexRow(rowIndex = it, entries = pokemonlist, navController = navController)
