@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -203,7 +204,10 @@ fun PokemonList(navController: NavController, viewModel: PokemonListViewModel = 
         items(itemCount) {
             // verificando paginação
             if (it >= itemCount - 1 && !endReached && !isLoading && !isSearching) {
-                viewModel.loadPokemonPaginated()
+                LaunchedEffect(key1 = true){
+                    viewModel.loadPokemonPaginated()
+                }
+
             }
             PokedexRow(rowIndex = it, entries = pokemonlist, navController = navController)
         }
